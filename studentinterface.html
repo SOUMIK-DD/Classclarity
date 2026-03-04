@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class Clarity — Student</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f3ff;--s1:#ffffff;--s2:#eeecff;--border:#dddaf5;--green:#00c47d;--green-bg:#e8fff5;--green-bdr:#9fedd4;--red:#f03060;--red-bg:#fff0f4;--red-bdr:#f9abc0;--yellow:#f5a623;--blue:#4080ff;--blue-bg:#eff4ff;--purple:#7c4dff;--text:#1a1730;--muted:#7b7a99;--dim:#e5e3f5;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(124,77,255,0.08) 0%,transparent 55%),radial-gradient(ellipse at 80% 80%,rgba(0,196,125,0.08) 0%,transparent 55%),radial-gradient(ellipse at 80% 10%,rgba(64,128,255,0.06) 0%,transparent 45%);pointer-events:none;z-index:0;}
+
+/* ── JOIN SCREEN ── */
+.join-screen{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0;padding:24px;}
+.join-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(124,77,255,0.1) 0%,transparent 60%);pointer-events:none;}
+.js-card{background:var(--s1);border:1px solid var(--border);border-radius:24px;padding:40px 36px;width:100%;max-width:400px;text-align:center;position:relative;box-shadow:0 20px 60px rgba(100,80,200,0.12);animation:popIn 0.5s cubic-bezier(.4,0,.2,1) both;}
+@keyframes popIn{from{opacity:0;transform:scale(0.92);}to{opacity:1;transform:scale(1);}}
+.js-logo{width:64px;height:64px;background:linear-gradient(135deg,var(--green),var(--blue));border-radius:18px;display:grid;place-items:center;font-size:32px;margin:0 auto 20px;box-shadow:0 8px 28px rgba(0,196,125,0.3);}
+.js-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;letter-spacing:-0.04em;margin-bottom:6px;}
+.js-title em{font-style:normal;color:var(--purple);}
+.js-sub{color:var(--muted);font-size:0.88rem;margin-bottom:28px;}
+.js-input{width:100%;background:var(--s2);border:2px solid var(--border);border-radius:14px;padding:14px 18px;font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:500;letter-spacing:0.15em;text-align:center;color:var(--text);outline:none;text-transform:uppercase;transition:border-color 0.2s,box-shadow 0.2s;margin-bottom:14px;}
+.js-input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,77,255,0.12);}
+.js-input::placeholder{color:var(--muted);letter-spacing:0.08em;font-size:1rem;}
+.js-join-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--purple),#5533cc);border:none;border-radius:14px;color:white;font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;cursor:pointer;transition:all 0.2s;box-shadow:0 6px 22px rgba(124,77,255,0.35);}
+.js-join-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(124,77,255,0.45);}
+.js-join-btn:active{transform:scale(0.98);}
+.js-anon{margin-top:14px;font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:5px;}
+.js-err{color:var(--red);font-size:0.8rem;font-family:'DM Mono',monospace;margin-bottom:10px;min-height:20px;}
+
+/* ── MAIN APP ── */
+.app-wrap{display:none;min-height:100vh;}
+.header{position:sticky;top:0;z-index:100;background:rgba(244,243,255,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--green),var(--blue));border-radius:10px;display:grid;place-items:center;font-size:16px;box-shadow:0 2px 12px rgba(0,196,125,0.3);}
+.brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;letter-spacing:-0.03em;}
+.brand-name em{font-style:normal;color:var(--purple);}
+.header-right{display:flex;align-items:center;gap:8px;}
+.anon-badge{display:flex;align-items:center;gap:6px;background:var(--s1);border:1px solid var(--border);border-radius:100px;padding:5px 12px;font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);}
+.student-id-badge{background:var(--s2);border:1px solid var(--border);border-radius:100px;padding:5px 12px;font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--purple);}
+.page{position:relative;z-index:1;padding:28px 20px 60px;max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:16px;}
+@keyframes pop{from{opacity:0;transform:scale(0.95) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.page-intro{text-align:center;padding:10px 0 4px;animation:pop 0.5s ease both;}
+.page-intro h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;letter-spacing:-0.04em;margin-bottom:6px;}
+.page-intro p{color:var(--muted);font-size:0.88rem;}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:22px;box-shadow:0 2px 16px rgba(100,80,200,0.06);animation:pop 0.5s ease both;}
+.card:nth-child(2){animation-delay:0.05s;}.card:nth-child(3){animation-delay:0.1s;}.card:nth-child(4){animation-delay:0.15s;}.card:nth-child(5){animation-delay:0.2s;}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+.card-title .chip{background:var(--s2);border-radius:6px;padding:4px 8px;font-size:1rem;}
+/* BIG BUTTONS */
+.clarity-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.big-choice{padding:24px 12px;border-radius:16px;border:2px solid transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-weight:800;font-size:0.95rem;transition:all 0.22s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;background:var(--bg);}
+.big-choice .emoji{font-size:2.8rem;line-height:1;transition:transform 0.2s;}
+.big-choice:hover .emoji{transform:scale(1.15);}
+.big-choice.choice-good{background:var(--green-bg);border-color:var(--green-bdr);color:#007a50;}
+.big-choice.choice-good:hover{border-color:var(--green);box-shadow:0 8px 28px rgba(0,196,125,0.2);transform:translateY(-2px);}
+.big-choice.choice-lost{background:var(--red-bg);border-color:var(--red-bdr);color:#b0003a;}
+.big-choice.choice-lost:hover{border-color:var(--red);box-shadow:0 8px 28px rgba(240,48,96,0.2);transform:translateY(-2px);}
+.big-choice.selected{transform:scale(1.03) translateY(-2px)!important;}
+.big-choice.choice-good.selected{border-color:var(--green);box-shadow:0 8px 32px rgba(0,196,125,0.3);}
+.big-choice.choice-lost.selected{border-color:var(--red);box-shadow:0 8px 32px rgba(240,48,96,0.3);}
+.checkmark{position:absolute;top:8px;right:10px;font-size:1.1rem;opacity:0;transition:opacity 0.2s;}
+.big-choice.selected .checkmark{opacity:1;}
+.voted-notice{margin-top:12px;text-align:center;font-size:0.8rem;color:var(--muted);font-family:'DM Mono',monospace;min-height:20px;}
+/* SPEED */
+.slider-zone{display:flex;flex-direction:column;gap:12px;}
+input[type=range]{-webkit-appearance:none;width:100%;height:10px;border-radius:5px;outline:none;cursor:pointer;background:linear-gradient(90deg,var(--red) 0%,var(--yellow) 50%,var(--green) 100%);}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:white;border:3px solid var(--border);box-shadow:0 2px 12px rgba(100,80,200,0.2);cursor:grab;transition:transform 0.15s;}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15);}
+.speed-labels-row{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);}
+.speed-current{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--s2);border-radius:12px;padding:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;transition:color 0.3s;}
+.speed-sent-notice{text-align:center;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--green);min-height:20px;}
+/* QUESTIONS */
+.q-input-wrap{display:flex;gap:10px;align-items:flex-end;margin-bottom:16px;}
+.q-textarea{flex:1;background:var(--s2);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:0.88rem;outline:none;resize:none;height:48px;transition:border-color 0.2s,box-shadow 0.2s;}
+.q-textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,77,255,0.1);}
+.q-textarea::placeholder{color:var(--muted);}
+.send-btn{width:48px;height:48px;background:linear-gradient(135deg,var(--purple),#5533cc);border:none;border-radius:12px;cursor:pointer;font-size:1.2rem;display:grid;place-items:center;transition:all 0.2s;box-shadow:0 4px 14px rgba(124,77,255,0.35);flex-shrink:0;}
+.send-btn:hover{transform:scale(1.08);}
+.q-others-label{font-family:'DM Mono',monospace;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:10px;}
+.q-list{display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.q-empty-msg{text-align:center;padding:20px;color:var(--muted);font-family:'DM Mono',monospace;font-size:0.78rem;}
+.q-row{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;animation:pop 0.25s ease;}
+.q-row-text{flex:1;font-size:0.85rem;line-height:1.4;}
+.upvote-btn{display:flex;align-items:center;gap:5px;background:var(--s1);border:1.5px solid var(--border);border-radius:8px;padding:5px 10px;cursor:pointer;font-family:'DM Mono',monospace;font-size:0.78rem;font-weight:500;color:var(--muted);transition:all 0.18s;flex-shrink:0;}
+.upvote-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg);}
+.upvote-btn.voted{border-color:var(--blue);color:var(--blue);background:var(--blue-bg);}
+/* CHECKIN */
+.checkin-hidden{display:none;}
+.checkin-prompt{text-align:center;padding:6px 0 14px;}
+.checkin-prompt p{font-size:0.9rem;color:var(--muted);margin-bottom:16px;}
+.star-row{display:flex;justify-content:center;gap:10px;}
+.star-opt{width:52px;height:60px;background:var(--s2);border:2px solid var(--border);border-radius:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:var(--muted);transition:all 0.18s cubic-bezier(.4,0,.2,1);}
+.star-opt .star-sub{font-size:0.58rem;font-family:'DM Mono',monospace;font-weight:400;}
+.star-opt:hover{border-color:var(--purple);color:var(--purple);transform:translateY(-3px);box-shadow:0 6px 18px rgba(124,77,255,0.15);}
+.star-opt.selected{background:rgba(124,77,255,0.1);border-color:var(--purple);color:var(--purple);transform:translateY(-3px) scale(1.06);box-shadow:0 8px 24px rgba(124,77,255,0.25);}
+.checkin-thanks{display:none;flex-direction:column;align-items:center;gap:10px;padding:16px 0 6px;text-align:center;}
+.checkin-thanks .big-check{font-size:3rem;}
+.checkin-thanks p{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;}
+.checkin-thanks small{color:var(--muted);font-size:0.78rem;}
+.footer-note{text-align:center;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);padding:8px 0 0;letter-spacing:0.04em;}
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:var(--bg);border-radius:100px;padding:12px 24px;font-size:0.85rem;font-weight:600;transition:transform 0.35s cubic-bezier(.4,0,.2,1);z-index:999;white-space:nowrap;display:flex;align-items:center;gap:8px;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- JOIN SCREEN -->
+<div class="join-screen" id="joinScreen">
+  <div class="js-card">
+    <div class="js-logo">📡</div>
+    <h1 class="js-title">Class<em>Clarity</em></h1>
+    <p class="js-sub">Enter your room code to join the live session</p>
+    <div class="js-err" id="jsErr"></div>
+    <input class="js-input" id="codeInput" type="text" placeholder="e.g. CC-4821" maxlength="7"
+      oninput="this.value=this.value.toUpperCase()"
+      onkeydown="if(event.key==='Enter')tryJoin()">
+    <button class="js-join-btn" onclick="tryJoin()">Join Session →</button>
+    <div class="js-anon">🕶️ Your identity stays completely anonymous</div>
+  </div>
+</div>
+
+<!-- MAIN APP (hidden until joined) -->
+<div class="app-wrap" id="appWrap">
+  <header class="header">
+    <div class="brand">
+      <div class="brand-mark">📡</div>
+      <span class="brand-name">Class<em>Clarity</em></span>
+    </div>
+    <div class="header-right">
+      <div class="anon-badge">🕶️ Anonymous</div>
+      <div class="student-id-badge" id="myIdBadge"></div>
+    </div>
+  </header>
+
+  <div class="page">
+    <div class="page-intro">
+      <h2>How's it going? 👋</h2>
+      <p>Your responses are <strong>100% anonymous</strong> — speak freely!</p>
+    </div>
+
+    <!-- 1. CLARITY -->
+    <div class="card">
+      <div class="card-title"><span class="chip">📊</span>Do you understand the current topic?</div>
+      <div class="clarity-grid">
+        <button class="big-choice choice-good" id="btnGood" onclick="castVote('good')">
+          <span class="checkmark">✓</span><span class="emoji">✅</span>Good to Go!
+        </button>
+        <button class="big-choice choice-lost" id="btnLost" onclick="castVote('lost')">
+          <span class="checkmark">✓</span><span class="emoji">🆘</span>I'm Lost
+        </button>
+      </div>
+      <div class="voted-notice" id="voteNotice"></div>
+    </div>
+
+    <!-- 2. SPEED -->
+    <div class="card">
+      <div class="card-title"><span class="chip">🎚️</span>How's the teaching pace?</div>
+      <div class="slider-zone">
+        <div class="speed-current" id="speedDisplay"><span>✅</span><span id="speedText">Just Right</span></div>
+        <input type="range" min="1" max="5" value="3" id="speedSlider" oninput="updateSpeed()" onchange="submitSpeed()">
+        <div class="speed-labels-row"><span>🐢 Too Slow</span><span>✅ Just Right</span><span>🚀 Too Fast</span></div>
+        <div class="speed-sent-notice" id="speedSentNotice"></div>
+      </div>
+    </div>
+
+    <!-- 3. QUESTIONS -->
+    <div class="card">
+      <div class="card-title"><span class="chip">💬</span>Ask a question (anonymous)</div>
+      <div class="q-input-wrap">
+        <textarea class="q-textarea" id="qInput" placeholder="Type your question here…"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitQuestion();}"></textarea>
+        <button class="send-btn" onclick="submitQuestion()" title="Send">✈️</button>
+      </div>
+      <div class="q-others-label">Upvote questions you also have 👇</div>
+      <div class="q-list" id="qList"><div class="q-empty-msg">No questions yet — be the first!</div></div>
+    </div>
+
+    <!-- 4. CHECKIN -->
+    <div class="card checkin-hidden" id="checkinCard">
+      <div class="card-title"><span class="chip">⭐</span>Homework Readiness Check-in</div>
+      <div class="checkin-prompt">
+        <p>Your teacher wants to know — how ready are you for tonight's homework?</p>
+        <div class="star-row" id="starRow">
+          <div class="star-opt" onclick="submitCheckin(1)"><span>1</span><span class="star-sub">Not ready</span></div>
+          <div class="star-opt" onclick="submitCheckin(2)"><span>2</span><span class="star-sub">Shaky</span></div>
+          <div class="star-opt" onclick="submitCheckin(3)"><span>3</span><span class="star-sub">Okay</span></div>
+          <div class="star-opt" onclick="submitCheckin(4)"><span>4</span><span class="star-sub">Good</span></div>
+          <div class="star-opt" onclick="submitCheckin(5)"><span>5</span><span class="star-sub">Confident!</span></div>
+        </div>
+      </div>
+      <div class="checkin-thanks" id="checkinThanks">
+        <div class="big-check">🎉</div><p>Thanks for your response!</p><small>Your teacher can see the class summary</small>
+      </div>
+    </div>
+
+    <div class="footer-note">No account needed · All responses anonymous · Class Clarity © 2025</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY='classClarityState';
+const VALID_CODE='CC-4821';
+const AVATARS=['😊','😎','🤔','😅','🙂','😄','🤩','😶','🧐','😌','😇','🤓','😁','🙃','😏','🫡','🤗','😬','🫠','😴'];
+
+function getState(){try{return JSON.parse(localStorage.getItem(KEY))||fresh();}catch{return fresh();}}
+function fresh(){return{students:{},good:0,lost:0,speedSum:0,speedTotal:0,questions:[],checkinSent:false,checkinVotes:[0,0,0,0,0]};}
+
+// ── MY SESSION ──
+let myId=null, myEmoji=null, myVote=null, speedDone=false, myQIds=new Set(), myUpvotes=new Set(), checkinDone=false;
+
+// ── JOIN ──
+function tryJoin(){
+  const code=document.getElementById('codeInput').value.trim().toUpperCase();
+  const errEl=document.getElementById('jsErr');
+  if(!code){errEl.textContent='Please enter a room code.';return;}
+  if(code!==VALID_CODE){errEl.textContent='❌ Invalid code. Ask your teacher for the room code.';return;}
+  errEl.textContent='';
+  joinSession();
+}
+
+function joinSession(){
+  myId='s_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+  myEmoji=AVATARS[Math.floor(Math.random()*AVATARS.length)];
+
+  // Register in shared state
+  const st=getState();
+  st.students[myId]={id:myId,emoji:myEmoji,joinedAt:Date.now()};
+  localStorage.setItem(KEY,JSON.stringify(st));
+
+  // Update UI
+  document.getElementById('joinScreen').style.display='none';
+  document.getElementById('appWrap').style.display='block';
+  document.getElementById('myIdBadge').textContent=myEmoji+' #'+myId.slice(-4);
+
+  showToast('🎉 Joined! Welcome to the session');
+  updateSpeed();
+  renderQ();
+  poll();
+}
+
+// Send heartbeat so teacher knows you're still here
+setInterval(()=>{
+  if(!myId)return;
+  const st=getState();
+  if(st.students[myId]) st.students[myId].lastSeen=Date.now();
+  localStorage.setItem(KEY,JSON.stringify(st));
+},5000);
+
+// ── CLARITY VOTE ──
+function castVote(choice){
+  const st=getState();
+  if(myVote===choice)return;
+  if(myVote==='good')st.good=Math.max(0,st.good-1);
+  if(myVote==='lost')st.lost=Math.max(0,st.lost-1);
+  if(choice==='good')st.good++;else st.lost++;
+  myVote=choice;
+  localStorage.setItem(KEY,JSON.stringify(st));
+  document.getElementById('btnGood').classList.toggle('selected',choice==='good');
+  document.getElementById('btnLost').classList.toggle('selected',choice==='lost');
+  document.getElementById('voteNotice').textContent=choice==='good'?'✅ Vote recorded!':'🆘 Got it — your teacher will see this';
+  showToast(choice==='good'?'✅ Response sent!':'🆘 Sent anonymously');
+}
+
+// ── SPEED ──
+const spL=['','🐢 Too Slow','🐌 Slow','✅ Just Right','⚡ Fast','🚀 Too Fast'];
+const spC=['','#f03060','#f5a623','#00c47d','#f5a623','#f03060'];
+function updateSpeed(){
+  const v=parseInt(document.getElementById('speedSlider').value);
+  document.getElementById('speedText').textContent=spL[v];
+  document.getElementById('speedDisplay').style.color=spC[v];
+}
+function submitSpeed(){
+  if(!myId)return;
+  const v=parseInt(document.getElementById('speedSlider').value);
+  const st=getState();
+  st.speedSum+=v;st.speedTotal+=1;
+  localStorage.setItem(KEY,JSON.stringify(st));
+  document.getElementById('speedSentNotice').textContent='✓ Pace feedback sent!';
+  setTimeout(()=>document.getElementById('speedSentNotice').textContent='',3000);
+}
+updateSpeed();
+
+// ── QUESTIONS ──
+function submitQuestion(){
+  if(!myId)return;
+  const input=document.getElementById('qInput');
+  const text=input.value.trim();if(!text)return;
+  const st=getState();
+  const id='q_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+  st.questions.push({id,text,votes:0});
+  myQIds.add(id);
+  localStorage.setItem(KEY,JSON.stringify(st));
+  input.value='';renderQ();showToast('💬 Question sent anonymously!');
+}
+
+function upvote(id){
+  if(myUpvotes.has(id)||myQIds.has(id))return;
+  const st=getState();
+  const q=st.questions.find(q=>q.id===id);
+  if(q){q.votes++;myUpvotes.add(id);localStorage.setItem(KEY,JSON.stringify(st));renderQ();showToast('👍 Upvoted!');}
+}
+
+function renderQ(){
+  const st=getState();
+  const list=document.getElementById('qList');
+  if(!st.questions.length){list.innerHTML='<div class="q-empty-msg">No questions yet — be the first!</div>';return;}
+  const sorted=[...st.questions].sort((a,b)=>b.votes-a.votes);
+  list.innerHTML=sorted.map(q=>{
+    const isMine=myQIds.has(q.id),voted=myUpvotes.has(q.id);
+    return '<div class="q-row"><div class="q-row-text">'+esc(q.text)+(isMine?' <span style="font-size:0.65rem;color:var(--muted);font-family:DM Mono,monospace;">(yours)</span>':'')+'</div><button class="upvote-btn'+(voted||isMine?' voted':'')+'"'+(isMine?'disabled style="opacity:0.5;cursor:default"':'onclick="upvote(\''+q.id+'\')"')+'>▲ '+q.votes+'</button></div>';
+  }).join('');
+}
+
+// ── CHECKIN ──
+function submitCheckin(val){
+  if(checkinDone)return;checkinDone=true;
+  const st=getState();st.checkinVotes[val-1]++;localStorage.setItem(KEY,JSON.stringify(st));
+  document.querySelectorAll('.star-opt').forEach((el,i)=>{el.classList.toggle('selected',i===val-1);el.style.pointerEvents='none';});
+  setTimeout(()=>{document.getElementById('starRow').style.display='none';document.getElementById('checkinThanks').style.display='flex';},600);
+  showToast('⭐ Readiness submitted!');
+}
+
+// ── POLL ──
+let lastCI=false,lastQN=0;
+function poll(){
+  if(!myId)return;
+  const st=getState();
+  if(st.checkinSent&&!lastCI){
+    document.getElementById('checkinCard').classList.remove('checkin-hidden');
+    showToast('📋 Teacher sent a check-in!');
+  }
+  lastCI=st.checkinSent;
+  if(st.questions.length!==lastQN){renderQ();lastQN=st.questions.length;}
+}
+setInterval(poll,1500);
+
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>
